@@ -1,4 +1,3 @@
-// src/components/ui/Butterfly.tsx
 "use client";
 
 import React, { Suspense, useEffect, useRef, useState } from "react";
@@ -17,18 +16,16 @@ function ButterflyModel() {
   const gltf = useGLTF("/model/butterfly.glb") as GLTFWithAnimations;
   const { actions } = useAnimations(gltf.animations, ref);
 
-  // Play first animation
   useEffect(() => {
     const [firstAction] = Object.values(actions);
     firstAction?.play();
-  }, [actions]);
+  }, [actions, gltf.animations]); // Added gltf.animations to fix ESLint warning
 
-  // Animate butterfly movement
   useFrame(({ clock }, delta) => {
     if (ref.current) {
       const time = clock.getElapsedTime();
       ref.current.position.x += delta * 2.0;
-      ref.current.position.y = Math.sin(time * 2) * 0.3; // graceful up/down
+      ref.current.position.y = Math.sin(time * 2) * 0.3;
       if (ref.current.position.x > 6) ref.current.position.x = -6;
     }
   });
@@ -38,8 +35,8 @@ function ButterflyModel() {
       ref={ref}
       object={gltf.scene}
       scale={0.6}
-      position={[-6, 0.2, 1]}
-      rotation={[Math.PI / 2.3, 0.3, 0.15]} // slight tilt for elegance
+      position={[-6, 2, 1]}
+      rotation={[Math.PI / 2.3, 0.3, 0.15]}
     />
   );
 }
