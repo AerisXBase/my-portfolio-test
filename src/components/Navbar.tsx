@@ -29,11 +29,12 @@ export function Navbar() {
         <NavbarLogo />
         <NavItems items={navLinks} /> {/* ← Remove visible */}
         <NavbarButton
-          href="/contact"
-          variant="primary"
-          className="hover:text-[#800020]"
+          href="/about"
+          className="ml-4"
+          variant="secondary"
+          onClickAction={() => console.log("clicked")}
         >
-          Get in touch
+          About
         </NavbarButton>
       </NavBody>
 
@@ -43,7 +44,7 @@ export function Navbar() {
           <NavbarLogo />
           <MobileNavToggle
             isOpen={isMenuOpen}
-            onClick={() => setIsMenuOpen((prev) => !prev)}
+            onClickAction={() => setIsMenuOpen((prev) => !prev)}
           />
         </MobileNavHeader>
 
@@ -59,11 +60,12 @@ export function Navbar() {
             </a>
           ))}
           <NavbarButton
-            href="/contact"
-            variant="primary"
-            className="mt-4 w-full text-center hover:text-[#800020]"
+            href="/about"
+            className="ml-4"
+            variant="secondary"
+            onClickAction={() => setIsMenuOpen(false)}
           >
-            Get in touch
+            About
           </NavbarButton>
         </MobileNavMenu>
       </MobileNav>

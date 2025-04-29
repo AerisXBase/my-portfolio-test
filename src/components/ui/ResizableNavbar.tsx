@@ -24,10 +24,7 @@ interface NavBodyProps {
 }
 
 interface NavItemsProps {
-  items: {
-    name: string;
-    link: string;
-  }[];
+  items: { name: string; link: string }[];
   className?: string;
   onItemClick?: () => void;
   visible?: boolean;
@@ -53,11 +50,8 @@ interface MobileNavMenuProps {
 
 export const Navbar = ({ children, className }: NavbarProps) => {
   const ref = useRef<HTMLDivElement>(null);
-  const { scrollY } = useScroll({
-    target: ref,
-    offset: ["start start", "end start"],
-  });
-  const [visible, setVisible] = useState<boolean>(false);
+  const { scrollY } = useScroll({ target: ref });
+  const [visible, setVisible] = useState(false);
 
   useMotionValueEvent(scrollY, "change", (latest) => {
     setVisible(latest > 100);
@@ -94,10 +88,9 @@ export const NavBody = ({ children, className, visible }: NavBodyProps) => (
     style={{ minWidth: "800px" }}
     className={cn(
       "relative z-[60] mx-auto hidden w-full max-w-7xl flex-row items-center justify-between self-start pl-8 pr-16 lg:flex",
-      !visible &&
-        "mt-4 rounded-full bg-gradient-to-r from-white via-gray-100 to-gray-300 shadow-lg backdrop-blur-md dark:bg-white/10",
-      visible &&
-        "rounded-full bg-gradient-to-r from-cyan-700/50 via-purple-800/50 to-indigo-900/50",
+      !visible
+        ? "mt-4 rounded-full bg-gradient-to-r from-white via-gray-100 to-gray-300 shadow-lg backdrop-blur-md dark:bg-white/10"
+        : "rounded-full bg-gradient-to-r from-cyan-700/50 via-purple-800/50 to-indigo-900/50",
       className
     )}
   >
@@ -124,19 +117,20 @@ export const NavItems = ({
     <motion.div
       onMouseLeave={() => setHovered(null)}
       className={cn(
-        "absolute inset-0 hidden flex-1 flex-row items-center justify-center space-x-2 text-sm font-medium text-zinc-600 text-[16px] transition duration-200 hover:text-zinc-800 lg:flex lg:space-x-2",
+        "absolute inset-0 hidden flex-1 flex-row items-center justify-center space-x-2 text-sm font-medium text-zinc-600 transition duration-200 hover:text-zinc-800 lg:flex lg:space-x-2",
         className
       )}
     >
       {items.map((item, idx) => (
         <a
-          key={`link-${idx}`}
+          key={idx}
           href={item.link}
           onMouseEnter={() => setHovered(idx)}
           onClick={onItemClick}
           className={cn(
-            !visible && "relative px-4 py-2 text-black/90",
-            visible && "text-white relative px-4 py-2"
+            visible
+              ? "text-white relative px-4 py-2"
+              : "relative px-4 py-2 text-black/90"
           )}
         >
           {hovered === idx && (
@@ -167,9 +161,9 @@ export const MobileNav = ({ children, className, visible }: MobileNavProps) => (
     transition={{ type: "spring", stiffness: 200, damping: 50 }}
     className={cn(
       "relative z-50 mx-auto flex w-full max-w-[calc(100vw-2rem)] flex-col items-center justify-between px-6 lg:hidden",
-      !visible &&
-        "mt-4 rounded-md bg-white shadow-md backdrop-blur-md dark:bg-white/10",
-      visible && "rounded-md bg-white dark:bg-neutral-950/80",
+      !visible
+        ? "mt-4 rounded-md bg-white shadow-md backdrop-blur-md dark:bg-white/10"
+        : "rounded-md bg-white dark:bg-neutral-950/80",
       className
     )}
   >
@@ -182,10 +176,7 @@ export const MobileNavHeader = ({
   className,
 }: MobileNavHeaderProps) => (
   <div
-    className={cn(
-      "flex w-full flex-row items-center justify-between px-4",
-      className
-    )}
+    className={cn("flex w-full items-center justify-between px-4", className)}
   >
     {children}
   </div>
@@ -215,15 +206,18 @@ export const MobileNavMenu = ({
 
 export const MobileNavToggle = ({
   isOpen,
-  onClick,
+  onClickAction,
 }: {
   isOpen: boolean;
-  onClick: () => void;
+  onClickAction: () => void;
 }) =>
   isOpen ? (
-    <IconX className="dark:text-white text-[#800020]" onClick={onClick} />
+    <IconX className="dark:text-white text-[#800020]" onClick={onClickAction} />
   ) : (
-    <IconMenu2 className="text-[#800020] dark:text-white" onClick={onClick} />
+    <IconMenu2
+      className="text-[#800020] dark:text-white"
+      onClick={onClickAction}
+    />
   );
 
 export const NavbarLogo = () => (
@@ -243,46 +237,45 @@ export const NavbarLogo = () => (
   </Link>
 );
 
-export const NavbarButton = ({
-  href,
-  as: Tag = "a",
-  children,
-  className,
-  variant = "primary",
-  ...props
-}: {
-  href?: string;
-  as?: React.ElementType;
+// Simplified NavbarButton: always renders an <a> tag
+interface NavbarButtonProps {
+  href: string;
   children: React.ReactNode;
   className?: string;
   variant?: "primary" | "secondary" | "dark" | "gradient";
   visible?: boolean;
-} & (
-  | React.ComponentPropsWithoutRef<"a">
-  | React.ComponentPropsWithoutRef<"button">
-)) => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { visible, ...restProps } = props;
+  onClickAction?: () => void;
+}
+
+export const NavbarButton: React.FC<NavbarButtonProps> = ({
+  href,
+  children,
+  className,
+  variant = "primary",
+  visible = true,
+  onClickAction,
+  ...props
+}) => {
+  if (!visible) return null;
 
   const baseStyles =
-    "px-4 py-2 rounded-full bg-white text-black/60 text-sm font-bold relative cursor-pointer transform transition-transform ease-out duration-400 hover:-translate-y-1 inline-block text-center";
+    "px-4 py-2 rounded-full bg-white text-black/60 text-sm font-bold relative cursor-pointer transition-transform duration-300 hover:-translate-y-1 inline-block text-center";
 
-  const variantStyles = {
-    primary:
-      "shadow-[0_0_24px_rgba(34,_42,_53,_0.06),_0_1px_1px_rgba(0,_0,_0,_0.05),_0_0_0_1px_rgba(34,_42,_53,_0.04),_0_0_4px_rgba(34,_42,_53,_0.08),_0_16px_68px_rgba(47,_48,_55,_0.05),_0_1px_0_rgba(255,_255,_255,_0.1)_inset]",
+  const variantStyles: Record<string, string> = {
+    primary: "shadow-lg",
     secondary: "bg-transparent shadow-none dark:text-white",
-    dark: "bg-black text-white shadow-[0_0_24px_rgba(34,_42,_53,_0.06),_0_1px_1px_rgba(0,_0,_0,_0.05),_0_0_0_1px_rgba(34,_42,_53,_0.04),_0_0_4px_rgba(34,_42,_53,_0.08),_0_16px_68px_rgba(47,_48,_55,_0.05),_0_1px_0_rgba(255,_255,_255,_0.1)_inset]",
-    gradient:
-      "bg-gradient-to-b from-blue-500 to-blue-700 text-white shadow-[0px_2px_0px_0px_rgba(255,255,255,0.3)_inset]",
+    dark: "bg-black text-white",
+    gradient: "bg-gradient-to-b from-blue-500 to-blue-700 text-white",
   };
 
   return (
-    <Tag
-      href={href || undefined}
+    <a
+      href={href}
+      onClick={onClickAction}
       className={cn(baseStyles, variantStyles[variant], className)}
-      {...restProps}
+      {...props}
     >
       {children}
-    </Tag>
+    </a>
   );
 };
