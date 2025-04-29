@@ -87,7 +87,7 @@ export const NavBody = ({ children, className, visible }: NavBodyProps) => (
     transition={{ type: "spring", stiffness: 200, damping: 50 }}
     style={{ minWidth: "800px" }}
     className={cn(
-      "relative z-[60] mx-auto hidden w-full max-w-7xl flex-row items-center justify-between self-start px-4 lg:px-16 lg:flex",
+      "relative z-[60] mx-auto hidden w-full max-w-7xl flex-row items-center justify-between self-start pl-8 pr-16 lg:flex",
       !visible
         ? "mt-4 rounded-full bg-gradient-to-r from-white via-gray-100 to-gray-300 shadow-lg backdrop-blur-md dark:bg-white/10"
         : "rounded-full bg-gradient-to-r from-cyan-700/50 via-purple-800/50 to-indigo-900/50",
@@ -117,9 +117,7 @@ export const NavItems = ({
     <motion.div
       onMouseLeave={() => setHovered(null)}
       className={cn(
-        "absolute inset-0 hidden flex-1 items-center justify-center space-x-4 lg:flex",
-        "text-sm font-medium",
-        visible ? "text-white" : "text-black/90",
+        "absolute inset-0 hidden flex-1 flex-row items-center justify-center space-x-2 text-sm font-medium text-zinc-600 transition duration-200 hover:text-zinc-800 lg:flex lg:space-x-2",
         className
       )}
     >
@@ -129,15 +127,19 @@ export const NavItems = ({
           href={item.link}
           onMouseEnter={() => setHovered(idx)}
           onClick={onItemClick}
-          className="relative px-4 py-2"
+          className={cn(
+            visible
+              ? "text-white relative px-4 py-2"
+              : "relative px-4 py-2 text-black/90"
+          )}
         >
           {hovered === idx && (
             <motion.div
               layoutId="hovered"
-              className="absolute inset-0 rounded-full bg-black/20 dark:bg-neutral-300"
+              className="absolute inset-0 h-full w-full rounded-full bg-black/20 dark:bg-neutral-300"
             />
           )}
-          <span className="relative z-10">{item.name}</span>
+          <span className="relative z-20">{item.name}</span>
         </a>
       ))}
     </motion.div>
@@ -148,13 +150,20 @@ export const MobileNav = ({ children, className, visible }: MobileNavProps) => (
   <motion.div
     animate={{
       backdropFilter: visible ? "blur(10px)" : "none",
-      boxShadow: visible ? "0 0 24px rgba(34, 42, 53, 0.06)" : "none",
+      boxShadow: visible
+        ? "0 0 24px rgba(34, 42, 53, 0.06), 0 1px 1px rgba(0, 0, 0, 0.05), 0 0 0 1px rgba(34, 42, 53, 0.04), 0 0 4px rgba(34, 42, 53, 0.08), 0 16px 68px rgba(47, 48, 55, 0.05), 0 1px 0 rgba(255, 255, 255, 0.1) inset"
+        : "none",
+      width: visible ? "90%" : "100%",
+      paddingRight: visible ? "12px" : "0px",
+      paddingLeft: visible ? "12px" : "0px",
       y: visible ? 20 : 0,
     }}
     transition={{ type: "spring", stiffness: 200, damping: 50 }}
     className={cn(
       "relative z-50 mx-auto flex w-full max-w-[calc(100vw-2rem)] flex-col items-center justify-between px-6 lg:hidden",
-      visible ? "bg-white/90 dark:bg-black/80" : "bg-white dark:bg-black/80",
+      !visible
+        ? "mt-4 rounded-md bg-white shadow-md backdrop-blur-md dark:bg-white/70"
+        : "rounded-md bg-white dark:bg-white",
       className
     )}
   >
@@ -185,7 +194,7 @@ export const MobileNavMenu = ({
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -10 }}
         className={cn(
-          "rounded-lg absolute inset-x-0 top-16 z-50 flex w-full flex-col items-center gap-4 bg-white px-4 py-6 shadow-lg dark:bg-black/90",
+          "rounded-lg absolute inset-x-0 top-[5rem] z-50 flex w-full flex-col items-center justify-start gap-4 bg-white px-4 py-4 pb-6 shadow-lg dark:bg-white/70",
           className
         )}
       >
@@ -206,7 +215,10 @@ export const MobileNavToggle = ({
     onClick={onClickAction}
     className={cn(
       "p-2 rounded-md focus:outline-none transition-colors duration-200",
-      isOpen ? "bg-white text-black" : "bg-transparent text-white"
+      // when open: white background + dark icon; when closed: transparent bg + accent color
+      isOpen
+        ? "text-[#800020] dark:text-white"
+        : "bg-transparent text-[#800020] dark:text-white"
     )}
   >
     {isOpen ? <IconX size={24} /> : <IconMenu2 size={24} />}
@@ -214,15 +226,27 @@ export const MobileNavToggle = ({
 );
 
 export const NavbarLogo = () => (
-  <Link href="/" className="relative z-20 flex items-center px-2">
-    <Image src="/images/logo/logo-4.png" alt="logo" width={40} height={40} />
+  <Link
+    href="/"
+    className="relative z-20 flex items-center space-x-2 px-2 text-sm font-normal text-black"
+  >
+    <Image
+      src="/images/logo/logo-4.png"
+      alt="logo"
+      width={100}
+      height={100}
+      priority
+      className="object-contain"
+      style={{ width: "100px", height: "auto" }}
+    />
   </Link>
 );
 
+// Simplified NavbarButton: always renders an <a> tag
 interface NavbarButtonProps {
   href: string;
   children: React.ReactNode;
-  className?: string; // <== this must exist
+  className?: string;
   variant?: "primary" | "secondary" | "dark" | "gradient";
   visible?: boolean;
   onClickAction?: () => void;
@@ -235,6 +259,7 @@ export const NavbarButton: React.FC<NavbarButtonProps> = ({
   variant = "primary",
   visible = true,
   onClickAction,
+  ...props
 }) => {
   if (!visible) return null;
 
@@ -252,7 +277,8 @@ export const NavbarButton: React.FC<NavbarButtonProps> = ({
     <a
       href={href}
       onClick={onClickAction}
-      className={`${baseStyles} ${variantStyles[variant]} ${className ?? ""}`}
+      className={cn(baseStyles, variantStyles[variant], className)}
+      {...props}
     >
       {children}
     </a>

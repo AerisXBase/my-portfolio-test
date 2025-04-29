@@ -13,7 +13,7 @@ export default function HomePage() {
   const [showIntro, setShowIntro] = useState(true);
 
   useEffect(() => {
-    const t = setTimeout(() => setShowIntro(false), 4000);
+    const t = setTimeout(() => setShowIntro(false), 8000);
     return () => clearTimeout(t);
   }, []);
 

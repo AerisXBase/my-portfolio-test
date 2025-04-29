@@ -4,9 +4,10 @@ import * as THREE from "three";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { useGLTF, useAnimations, PerspectiveCamera } from "@react-three/drei";
 import { GLTF } from "three-stdlib";
-import Image from "next/image";
 
-type GLTFWithAnimations = GLTF & { animations: THREE.AnimationClip[] };
+type GLTFWithAnimations = GLTF & {
+  animations: THREE.AnimationClip[];
+};
 
 function ButterflyModel() {
   const gltf = useGLTF("/model/butterfly.glb") as GLTFWithAnimations;
@@ -20,7 +21,7 @@ function ButterflyModel() {
 
   useFrame((_, delta) => {
     if (ref.current) {
-      ref.current.position.x += delta * 0.5; // slower speed
+      ref.current.position.x += delta * 1.5;
       if (ref.current.position.x > 5) ref.current.position.x = -5;
     }
   });
@@ -29,9 +30,9 @@ function ButterflyModel() {
     <primitive
       ref={ref}
       object={gltf.scene}
-      scale={0.6}
-      position-x={-5}
-      rotation={[0, Math.PI, 0]} // face model front-on
+      scale={0.5}
+      position={[-5, 0, 0]}
+      rotation={[Math.PI / 2.5, 0, 0]} // top-down angle
     />
   );
 }
@@ -52,20 +53,21 @@ export default function Butterfly() {
   if (!webglSupported) {
     return (
       <div className="fixed inset-0 bg-black flex items-center justify-center z-[999]">
-        <Image
-          src="/model/butterfly.png"
-          width={200}
-          height={200}
-          alt="butterfly"
-        />
+        <p className="text-white">3D not supported</p>
       </div>
     );
   }
 
   return (
-    <div className="fixed inset-0 bg-black overflow-hidden z-[999]">
+    <div className="fixed inset-0 bg-black dark:bg-black overflow-hidden z-[999] pointer-events-none">
       <Canvas className="w-full h-full">
-        <PerspectiveCamera makeDefault position={[0, 2, 8]} fov={45} />
+        <PerspectiveCamera
+          makeDefault
+          position={[0, 5, 0]} // looking from above
+          fov={50}
+          near={0.1}
+          far={100}
+        />
         <ambientLight intensity={1} />
         <Suspense fallback={null}>
           <ButterflyModel />

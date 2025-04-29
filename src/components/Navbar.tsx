@@ -29,12 +29,12 @@ export function Navbar() {
         <NavbarLogo />
         <NavItems items={navLinks} /> {/* ← Remove visible */}
         <NavbarButton
-          href="/about"
+          href="/contact"
           className="ml-4"
           variant="secondary"
           onClickAction={() => console.log("clicked")}
         >
-          About
+          Contact
         </NavbarButton>
       </NavBody>
 
@@ -60,12 +60,12 @@ export function Navbar() {
             </a>
           ))}
           <NavbarButton
-            href="/about"
+            href="/contact"
             className="ml-4"
             variant="secondary"
-            onClickAction={() => setIsMenuOpen(false)}
+            onClickAction={() => console.log("clicked")}
           >
-            About
+            Contact
           </NavbarButton>
         </MobileNavMenu>
       </MobileNav>
