@@ -46,7 +46,7 @@ export default function Butterfly() {
   }
 
   return (
-    <div className="w-full h-screen md:block hidden">
+    <div className="w-full h-screen md:blocks">
       <Canvas camera={{ position: [0, 0, 5], fov: 45 }}>
         <ambientLight intensity={0.8} />
         <directionalLight position={[5, 5, 5]} intensity={1} />

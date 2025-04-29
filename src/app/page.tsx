@@ -1,32 +1,36 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import Butterfly from "@/components/ui/Butterfly";
+import { Navbar } from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import About from "@/components/About";
 import ProjectsPreview from "@/components/ProjectsPreview";
+import { Footer } from "@/components/Footer";
 
-export default function Home() {
-  const [showContent, setShowContent] = useState(false);
+export default function HomePage() {
+  const [showIntro, setShowIntro] = useState(true);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowContent(true);
-    }, 4000); // 4 sec animation time for butterfly
+    const timer = setTimeout(() => setShowIntro(false), 4000);
     return () => clearTimeout(timer);
   }, []);
 
-  return (
-    <div className="w-full h-full bg-black">
-      {!showContent ? (
+  if (showIntro) {
+    return (
+      <div className="fixed inset-0 bg-[#f5f5dc] flex items-center justify-center z-50">
         <Butterfly />
-      ) : (
-        <>
-          <Hero />
-          <About />
-          <ProjectsPreview />
-        </>
-      )}
-    </div>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <Navbar />
+      <Hero />
+      <About />
+      <ProjectsPreview />
+      <Footer />
+    </>
   );
 }
