@@ -1,27 +1,43 @@
 "use client";
-
-import React, { Suspense, useEffect, useState } from "react";
-import { Canvas } from "@react-three/fiber";
-import { OrbitControls, useGLTF } from "@react-three/drei";
+import React, { Suspense, useEffect, useRef, useState } from "react";
+import * as THREE from "three";
+import { Canvas, useFrame } from "@react-three/fiber";
+import { useGLTF, useAnimations } from "@react-three/drei";
 import { GLTF } from "three-stdlib";
-import Image from "next/image";
 
-type GLTFResult = GLTF & {
-  nodes: unknown;
-  materials: unknown;
+// Extend GLTF type to include animations
+type GLTFWithAnimations = GLTF & {
+  animations: THREE.AnimationClip[];
 };
 
-function ButterFlyModel() {
-  const { scene } = useGLTF("/model/butterfly.glb") as GLTFResult;
-  return <primitive object={scene} scale={0.5} />;
-}
+function ButterflyModel() {
+  const gltf = useGLTF("/model/butterfly.glb") as GLTFWithAnimations;
+  const ref = useRef<THREE.Group>(null);
+  const { actions } = useAnimations(gltf.animations, ref);
 
-useGLTF.preload("/model/butterfly.glb");
+  // Play the first animation (e.g., wing flap) on mount
+  useEffect(() => {
+    const firstAction = Object.values(actions)[0];
+    firstAction?.play();
+  }, [actions]);
+
+  // Move the butterfly from left to right in a loop
+  useFrame((_, delta) => {
+    if (ref.current) {
+      ref.current.position.x += delta * 1.5; // speed adjust
+      if (ref.current.position.x > 5) ref.current.position.x = -5;
+    }
+  });
+
+  return (
+    <primitive ref={ref} object={gltf.scene} scale={0.5} position-x={-5} />
+  );
+}
 
 export default function Butterfly() {
   const [webglSupported, setWebglSupported] = useState(true);
 
-  // Check if WebGL is supported
+  // Check for WebGL support
   useEffect(() => {
     try {
       const canvas = document.createElement("canvas");
@@ -32,28 +48,25 @@ export default function Butterfly() {
     }
   }, []);
 
+  // Fallback for unsupported devices
   if (!webglSupported) {
-    // fallback for unsupported devices (like your laptop)
     return (
-      <div className="w-full h-screen flex items-center justify-center bg-black">
-        <Image
-          src="/model/butterfly.png"
-          alt="Butterfly fallback"
-          className="w-64 h-auto object-contain"
-        />
+      <div className="fixed inset-0 bg-black flex items-center justify-center z-[999]">
+        <p className="text-white">3D not supported</p>
       </div>
     );
   }
 
   return (
-    <div className="w-full h-screen md:blocks">
-      <Canvas camera={{ position: [0, 0, 5], fov: 45 }}>
-        <ambientLight intensity={0.8} />
-        <directionalLight position={[5, 5, 5]} intensity={1} />
+    <div className="fixed inset-0 bg-black overflow-hidden z-[999]">
+      <Canvas
+        camera={{ position: [0, 0, 10], fov: 50 }}
+        className="w-full h-full"
+      >
+        <ambientLight intensity={1} />
         <Suspense fallback={null}>
-          <ButterFlyModel />
+          <ButterflyModel />
         </Suspense>
-        <OrbitControls enableZoom={false} />
       </Canvas>
     </div>
   );
