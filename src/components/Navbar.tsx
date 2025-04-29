@@ -4,7 +4,6 @@ import {
   NavBody,
   NavItems,
   NavbarLogo,
-  NavbarButton,
   MobileNav,
   MobileNavToggle,
   MobileNavHeader,
@@ -28,14 +27,6 @@ export function Navbar() {
       <NavBody>
         <NavbarLogo />
         <NavItems items={navLinks} /> {/* ← Remove visible */}
-        <NavbarButton
-          href="/contact"
-          className="ml-4"
-          variant="secondary"
-          onClickAction={() => console.log("clicked")}
-        >
-          Contact
-        </NavbarButton>
       </NavBody>
 
       {/* Mobile Nav */}
@@ -54,19 +45,11 @@ export function Navbar() {
               key={`mobile-link-${idx}`}
               href={item.link}
               onClick={() => setIsMenuOpen(false)}
-              className="w-full px-2 py-2 text-center text-sm font-medium text-black dark:text-white border border-transparent hover:border-gray-500/20 rounded-lg transition-all duration-200 hover:-translate-y-0.5"
+              className="w-full px-2 py-2 text-center text-sm font-medium text-black border border-transparent hover:border-gray-500/20 rounded-lg transition-all duration-200 hover:-translate-y-0.5"
             >
               {item.name}
             </a>
           ))}
-          <NavbarButton
-            href="/contact"
-            className="ml-4"
-            variant="secondary"
-            onClickAction={() => console.log("clicked")}
-          >
-            Contact
-          </NavbarButton>
         </MobileNavMenu>
       </MobileNav>
     </ResizableNavbar>

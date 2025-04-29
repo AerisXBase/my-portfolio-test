@@ -117,7 +117,7 @@ export const NavItems = ({
     <motion.div
       onMouseLeave={() => setHovered(null)}
       className={cn(
-        "absolute inset-0 hidden flex-1 flex-row items-center justify-center space-x-2 text-sm font-medium text-zinc-600 transition duration-200 hover:text-zinc-800 lg:flex lg:space-x-2",
+        "absolute inset-0 hidden flex-1 flex-row items-center justify-center space-x-2 text-sm font-medium text-zinc-600 transition duration-200 hover:text-zinc-800 lg:flex lg:space-x-12",
         className
       )}
     >
@@ -194,7 +194,7 @@ export const MobileNavMenu = ({
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -10 }}
         className={cn(
-          "rounded-lg absolute inset-x-0 top-[5rem] z-50 flex w-full flex-col items-center justify-start gap-4 bg-white px-4 py-4 pb-6 shadow-lg dark:bg-white/70",
+          "rounded-lg absolute inset-x-0 top-[5rem] z-50 flex w-full flex-col items-center justify-start gap-4 bg-white px-4 py-4 pb-6 shadow-lg",
           className
         )}
       >
@@ -216,9 +216,7 @@ export const MobileNavToggle = ({
     className={cn(
       "p-2 rounded-md focus:outline-none transition-colors duration-200",
       // when open: white background + dark icon; when closed: transparent bg + accent color
-      isOpen
-        ? "text-[#800020] dark:text-white"
-        : "bg-transparent text-[#800020] dark:text-white"
+      isOpen ? "text-[#800020]" : "bg-transparent text-[#800020]"
     )}
   >
     {isOpen ? <IconX size={24} /> : <IconMenu2 size={24} />}
@@ -241,46 +239,3 @@ export const NavbarLogo = () => (
     />
   </Link>
 );
-
-// Simplified NavbarButton: always renders an <a> tag
-interface NavbarButtonProps {
-  href: string;
-  children: React.ReactNode;
-  className?: string;
-  variant?: "primary" | "secondary" | "dark" | "gradient";
-  visible?: boolean;
-  onClickAction?: () => void;
-}
-
-export const NavbarButton: React.FC<NavbarButtonProps> = ({
-  href,
-  children,
-  className,
-  variant = "primary",
-  visible = true,
-  onClickAction,
-  ...props
-}) => {
-  if (!visible) return null;
-
-  const baseStyles =
-    "px-4 py-2 rounded-full bg-white text-black/60 text-sm font-bold relative cursor-pointer transition-transform duration-300 hover:-translate-y-1 inline-block text-center";
-
-  const variantStyles: Record<string, string> = {
-    primary: "shadow-lg",
-    secondary: "bg-transparent shadow-none dark:text-white",
-    dark: "bg-black text-white",
-    gradient: "bg-gradient-to-b from-blue-500 to-blue-700 text-white",
-  };
-
-  return (
-    <a
-      href={href}
-      onClick={onClickAction}
-      className={cn(baseStyles, variantStyles[variant], className)}
-      {...props}
-    >
-      {children}
-    </a>
-  );
-};
