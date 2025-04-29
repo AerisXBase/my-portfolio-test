@@ -17,7 +17,7 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="w-full h-full bg-[#f5f5dc]">
+    <div className="w-full h-full bg-black">
       {!showContent ? (
         <Butterfly />
       ) : (
