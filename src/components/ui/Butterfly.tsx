@@ -12,11 +12,11 @@ type GLTFWithAnimations = GLTF & {
 };
 
 function ButterflyModel() {
-  const ref = useRef<THREE.Group>(null);
+  const groupRef = useRef<THREE.Group>(null);
   const gltf = useGLTF("/model/butterfly.glb") as GLTFWithAnimations;
-  const { actions } = useAnimations(gltf.animations, ref);
+  const { actions } = useAnimations(gltf.animations, groupRef);
 
-  // Check if the model and animations are loading, and play the animation
+  // Play the first animation if available
   useEffect(() => {
     console.log("GLTF Model:", gltf);
     console.log("Animations:", gltf.animations);
@@ -28,24 +28,30 @@ function ButterflyModel() {
     }
   }, [actions, gltf.animations]);
 
-  // Simple animation: move left to right and flap up/down
+  // Animate the butterfly: fly left to right once with gentle flapping
   useFrame(({ clock }, delta) => {
-    if (ref.current) {
+    if (groupRef.current) {
       const time = clock.getElapsedTime();
-      ref.current.position.x += delta * 2.0; // Move horizontally
-      ref.current.position.y = Math.sin(time * 2) * 0.3; // Gentle up-down motion
-      if (ref.current.position.x > 6) ref.current.position.x = -6; // Reset position
+      groupRef.current.position.x += delta * 1.5; // Speed to cross in ~8 seconds
+      groupRef.current.position.y = Math.sin(time * 2) * 0.3; // Smooth flapping
     }
   });
 
   return (
-    <primitive
-      ref={ref}
-      object={gltf.scene}
-      scale={1.5} // Make it big enough to see clearly
-      position={[-3, 1, 0]} // Start slightly left, centered in view
-      rotation={[0, Math.PI / 4, 0]} // Slight angle to show the body
-    />
+    <group ref={groupRef} position={[-6, 0, 0]}>
+      <primitive
+        object={gltf.scene}
+        scale={1.0}
+        rotation={[0, Math.PI / 2 + 0.3, 0]} // Faces right with back slightly visible
+      />
+      {/* Magical point light for glowing effect */}
+      <pointLight
+        position={[0, 0.5, 0]}
+        color="#88f"
+        intensity={1}
+        distance={5}
+      />
+    </group>
   );
 }
 
@@ -78,26 +84,18 @@ export default function Butterfly() {
   return (
     <div className="fixed inset-0 bg-black overflow-hidden z-[999] pointer-events-none">
       <Canvas>
-        <PerspectiveCamera makeDefault position={[0, 0, 5]} fov={45} />{" "}
-        {/* Camera close enough to see */}
-        <ambientLight intensity={0.5} /> {/* Soft base light */}
+        <PerspectiveCamera makeDefault position={[0, 0, 10]} fov={45} />{" "}
+        {/* Zoomed out */}
+        <ambientLight intensity={0.5} />
         <directionalLight
           position={[5, 5, 5]}
           intensity={1.0}
           color="#ffffff"
-        />{" "}
-        {/* Main light for brightness */}
-        <directionalLight
-          position={[-5, 5, -5]}
-          intensity={0.7}
-          color="#88f"
-        />{" "}
-        {/* Secondary light for a magical touch */}
+        />
+        <directionalLight position={[-5, 5, -5]} intensity={0.7} color="#88f" />
         <Suspense fallback={null}>
           <ButterflyModel />
         </Suspense>
-        {/* Uncomment the line below if you want to explore the scene */}
-        {/* <OrbitControls /> */}
       </Canvas>
     </div>
   );
