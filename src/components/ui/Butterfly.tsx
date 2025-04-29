@@ -16,17 +16,25 @@ function ButterflyModel() {
   const gltf = useGLTF("/model/butterfly.glb") as GLTFWithAnimations;
   const { actions } = useAnimations(gltf.animations, ref);
 
+  // Check if the model and animations are loading, and play the animation
   useEffect(() => {
+    console.log("GLTF Model:", gltf);
+    console.log("Animations:", gltf.animations);
     const [firstAction] = Object.values(actions);
-    firstAction?.play();
-  }, [actions, gltf.animations]); // Added gltf.animations to fix ESLint warning
+    if (firstAction) {
+      firstAction.play();
+    } else {
+      console.log("No animations found in the model.");
+    }
+  }, [actions, gltf.animations]);
 
+  // Simple animation: move left to right and flap up/down
   useFrame(({ clock }, delta) => {
     if (ref.current) {
       const time = clock.getElapsedTime();
-      ref.current.position.x += delta * 2.0;
-      ref.current.position.y = Math.sin(time * 2) * 0.3;
-      if (ref.current.position.x > 6) ref.current.position.x = -6;
+      ref.current.position.x += delta * 2.0; // Move horizontally
+      ref.current.position.y = Math.sin(time * 2) * 0.3; // Gentle up-down motion
+      if (ref.current.position.x > 6) ref.current.position.x = -6; // Reset position
     }
   });
 
@@ -34,9 +42,9 @@ function ButterflyModel() {
     <primitive
       ref={ref}
       object={gltf.scene}
-      scale={0.6}
-      position={[-6, 2, 1]}
-      rotation={[Math.PI / 2.3, 0.3, 0.15]}
+      scale={1.5} // Make it big enough to see clearly
+      position={[-3, 1, 0]} // Start slightly left, centered in view
+      rotation={[0, Math.PI / 4, 0]} // Slight angle to show the body
     />
   );
 }
@@ -48,7 +56,7 @@ export default function Butterfly() {
     try {
       const canvas = document.createElement("canvas");
       const gl = canvas.getContext("webgl2") || canvas.getContext("webgl");
-      if (!gl) throw new Error();
+      if (!gl) throw new Error("WebGL not supported");
     } catch {
       setWebglSupported(false);
     }
@@ -70,17 +78,26 @@ export default function Butterfly() {
   return (
     <div className="fixed inset-0 bg-black overflow-hidden z-[999] pointer-events-none">
       <Canvas>
-        <PerspectiveCamera makeDefault position={[0, 3.5, 6]} fov={45} />
-        <ambientLight intensity={0.5} />
+        <PerspectiveCamera makeDefault position={[0, 0, 5]} fov={45} />{" "}
+        {/* Camera close enough to see */}
+        <ambientLight intensity={0.5} /> {/* Soft base light */}
         <directionalLight
-          position={[5, 10, 5]}
-          intensity={1.2}
-          color="#fff8f8"
-        />
-        <directionalLight position={[-5, 8, -5]} intensity={0.5} color="#88f" />
+          position={[5, 5, 5]}
+          intensity={1.0}
+          color="#ffffff"
+        />{" "}
+        {/* Main light for brightness */}
+        <directionalLight
+          position={[-5, 5, -5]}
+          intensity={0.7}
+          color="#88f"
+        />{" "}
+        {/* Secondary light for a magical touch */}
         <Suspense fallback={null}>
           <ButterflyModel />
         </Suspense>
+        {/* Uncomment the line below if you want to explore the scene */}
+        {/* <OrbitControls /> */}
       </Canvas>
     </div>
   );
