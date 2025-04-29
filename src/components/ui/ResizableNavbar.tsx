@@ -162,8 +162,8 @@ export const MobileNav = ({ children, className, visible }: MobileNavProps) => (
     className={cn(
       "relative z-50 mx-auto flex w-full max-w-[calc(100vw-2rem)] flex-col items-center justify-between px-6 lg:hidden",
       !visible
-        ? "mt-4 rounded-md bg-white shadow-md backdrop-blur-md dark:bg-white/10"
-        : "rounded-md bg-white dark:bg-neutral-950/80",
+        ? "mt-4 rounded-md bg-white shadow-md backdrop-blur-md dark:bg-white/70"
+        : "rounded-md bg-white dark:bg-white",
       className
     )}
   >
