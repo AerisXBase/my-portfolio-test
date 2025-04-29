@@ -194,7 +194,7 @@ export const MobileNavMenu = ({
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -10 }}
         className={cn(
-          "rounded-lg absolute inset-x-0 top-[5rem] z-50 flex w-full flex-col items-center justify-start gap-4 bg-white px-4 py-4 pb-6 shadow-lg dark:bg-neutral-950",
+          "rounded-lg absolute inset-x-0 top-[5rem] z-50 flex w-full flex-col items-center justify-start gap-4 bg-white px-4 py-4 pb-6 shadow-lg dark:bg-white/70",
           className
         )}
       >
@@ -210,15 +210,20 @@ export const MobileNavToggle = ({
 }: {
   isOpen: boolean;
   onClickAction: () => void;
-}) =>
-  isOpen ? (
-    <IconX className="dark:text-white text-[#800020]" onClick={onClickAction} />
-  ) : (
-    <IconMenu2
-      className="text-[#800020] dark:text-white"
-      onClick={onClickAction}
-    />
-  );
+}) => (
+  <button
+    onClick={onClickAction}
+    className={cn(
+      "p-2 rounded-md focus:outline-none transition-colors duration-200",
+      // when open: white background + dark icon; when closed: transparent bg + accent color
+      isOpen
+        ? "bg-white text-black"
+        : "bg-transparent text-[#800020] dark:text-white"
+    )}
+  >
+    {isOpen ? <IconX size={24} /> : <IconMenu2 size={24} />}
+  </button>
+);
 
 export const NavbarLogo = () => (
   <Link
