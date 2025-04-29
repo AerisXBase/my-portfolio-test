@@ -10,11 +10,18 @@ import ProjectsPreview from "@/components/ProjectsPreview";
 import { Footer } from "@/components/Footer";
 
 export default function HomePage() {
-  const [showIntro, setShowIntro] = useState(true);
+  const [showIntro, setShowIntro] = useState(false);
 
   useEffect(() => {
-    const t = setTimeout(() => setShowIntro(false), 8000);
-    return () => clearTimeout(t);
+    const hasSeenIntro = localStorage.getItem("seenIntro");
+
+    if (!hasSeenIntro) {
+      setShowIntro(true);
+      localStorage.setItem("seenIntro", "true");
+
+      const timeout = setTimeout(() => setShowIntro(false), 8000);
+      return () => clearTimeout(timeout);
+    }
   }, []);
 
   if (showIntro) {
