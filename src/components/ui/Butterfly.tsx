@@ -1,14 +1,12 @@
-// src/components/ui/Butterfly.tsx
 "use client";
 import React, { Suspense, useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { useGLTF, useAnimations, PerspectiveCamera } from "@react-three/drei";
 import { GLTF } from "three-stdlib";
+import Image from "next/image";
 
-type GLTFWithAnimations = GLTF & {
-  animations: THREE.AnimationClip[];
-};
+type GLTFWithAnimations = GLTF & { animations: THREE.AnimationClip[] };
 
 function ButterflyModel() {
   const gltf = useGLTF("/model/butterfly.glb") as GLTFWithAnimations;
@@ -22,7 +20,7 @@ function ButterflyModel() {
 
   useFrame((_, delta) => {
     if (ref.current) {
-      ref.current.position.x += delta * 1.5;
+      ref.current.position.x += delta * 0.5; // slower speed
       if (ref.current.position.x > 5) ref.current.position.x = -5;
     }
   });
@@ -31,9 +29,9 @@ function ButterflyModel() {
     <primitive
       ref={ref}
       object={gltf.scene}
-      scale={0.5}
+      scale={0.6}
       position-x={-5}
-      rotation={[0, Math.PI / 4, 0]} // ← rotate model 45° around Y so wings face camera
+      rotation={[0, Math.PI, 0]} // face model front-on
     />
   );
 }
@@ -54,7 +52,12 @@ export default function Butterfly() {
   if (!webglSupported) {
     return (
       <div className="fixed inset-0 bg-black flex items-center justify-center z-[999]">
-        <p className="text-white">3D not supported</p>
+        <Image
+          src="/model/butterfly.png"
+          width={200}
+          height={200}
+          alt="butterfly"
+        />
       </div>
     );
   }
@@ -62,14 +65,7 @@ export default function Butterfly() {
   return (
     <div className="fixed inset-0 bg-black overflow-hidden z-[999]">
       <Canvas className="w-full h-full">
-        {/* Use a PerspectiveCamera so we can tweak its position */}
-        <PerspectiveCamera
-          makeDefault
-          position={[0, 1.5, 8]} // ← lift camera up and back
-          fov={50}
-          near={0.1}
-          far={100}
-        />
+        <PerspectiveCamera makeDefault position={[0, 2, 8]} fov={45} />
         <ambientLight intensity={1} />
         <Suspense fallback={null}>
           <ButterflyModel />
