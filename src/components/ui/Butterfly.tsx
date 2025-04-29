@@ -1,11 +1,15 @@
-import { Canvas, useFrame } from "@react-three/fiber";
-import { Suspense, useRef, useEffect } from "react";
-import { PerspectiveCamera, useGLTF, useAnimations } from "@react-three/drei";
-import * as THREE from "three";
+"use client";
 
-interface GLTFWithAnimations extends THREE.GLTF {
+import React, { Suspense, useEffect, useRef, useState } from "react";
+import * as THREE from "three";
+import { Canvas, useFrame } from "@react-three/fiber";
+import { useGLTF, useAnimations, PerspectiveCamera } from "@react-three/drei";
+import { GLTF } from "three-stdlib";
+import Image from "next/image";
+
+type GLTFWithAnimations = GLTF & {
   animations: THREE.AnimationClip[];
-}
+};
 
 function ButterflyModel() {
   const groupRef = useRef<THREE.Group>(null);
@@ -13,13 +17,15 @@ function ButterflyModel() {
   const { actions } = useAnimations(gltf.animations, groupRef);
 
   useEffect(() => {
+    console.log("GLTF Model:", gltf);
+    console.log("Animations:", gltf.animations);
     const [firstAction] = Object.values(actions);
     if (firstAction) {
       firstAction.play();
     } else {
       console.log("No animations found in the model.");
     }
-  }, [actions]);
+  }, [actions, gltf.animations, gltf]); // Added gltf to fix ESLint warning
 
   useFrame(({ clock }, delta) => {
     if (groupRef.current) {
@@ -55,6 +61,31 @@ function ButterflyModel() {
 }
 
 export default function Butterfly() {
+  const [webglSupported, setWebglSupported] = useState(true);
+
+  useEffect(() => {
+    try {
+      const canvas = document.createElement("canvas");
+      const gl = canvas.getContext("webgl2") || canvas.getContext("webgl");
+      if (!gl) throw new Error("WebGL not supported");
+    } catch {
+      setWebglSupported(false);
+    }
+  }, []);
+
+  if (!webglSupported) {
+    return (
+      <div className="fixed inset-0 bg-black flex items-center justify-center z-[999]">
+        <Image
+          src="/model/butterfly.png"
+          alt="Butterfly fallback"
+          width={200}
+          height={200}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="fixed inset-0 bg-black overflow-hidden z-[999] pointer-events-none">
       <Canvas>
