@@ -116,6 +116,7 @@ export default function Butterfly() {
           zIndex: -1,
         }}
       />
+      <h2 className="md:text-3xl text-xl text-white">This is an experience</h2>
       <Canvas shadows>
         <PerspectiveCamera makeDefault position={[0, 0, 15]} fov={45} />
         <ambientLight intensity={0.8} />
