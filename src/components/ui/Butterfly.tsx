@@ -16,13 +16,16 @@ function ButterflyModel() {
   const groupRef = useRef<THREE.Group>(null);
   const gltf = useGLTF("/model/butterfly.glb") as GLTFWithAnimations;
   const { actions } = useAnimations(gltf.animations, groupRef);
+  const firstActionRef = useRef<THREE.AnimationAction | null>(null);
 
   useEffect(() => {
     console.log("GLTF Model:", gltf);
     console.log("Animations:", gltf.animations);
     const [firstAction] = Object.values(actions);
     if (firstAction) {
+      firstActionRef.current = firstAction;
       firstAction.setEffectiveTimeScale(1.5); // Faster wing flapping
+      firstAction.paused = true; // Start paused
       firstAction.play();
     } else {
       console.log("No animations found in the model.");
@@ -33,9 +36,27 @@ function ButterflyModel() {
     if (groupRef.current) {
       const time = clock.getElapsedTime();
       const currentX = groupRef.current.position.x;
-      const newX = Math.min(currentX + delta * 2.0, 8); // 16 units in ~8 seconds
+      const newX = Math.min(currentX + delta * 3.2, 8); // 16 units in ~5 seconds
       groupRef.current.position.x = newX;
-      groupRef.current.position.y = 2 + Math.sin(time * 1.5) * 0.5; // Higher, falcon-like motion
+
+      // Animation phases
+      if (time < 1) {
+        // Phase 1: Low flight, no flapping
+        groupRef.current.position.y = 0.5;
+      } else if (time < 2) {
+        // Phase 2: Takeoff with flapping
+        if (firstActionRef.current && firstActionRef.current.paused) {
+          firstActionRef.current.paused = false; // Start flapping
+        }
+        groupRef.current.position.y = 0.5 + (time - 1) * 2; // Rise to y=2.5
+      } else {
+        // Phase 3: Natural glide with gentle flapping
+        groupRef.current.position.y = 2.5 + Math.sin(time * 1.5) * 0.3;
+        if (firstActionRef.current) {
+          firstActionRef.current.setEffectiveTimeScale(1.0); // Normal flapping
+        }
+      }
+
       groupRef.current.rotation.z = Math.sin(time * 2) * 0.1; // Slight tilt
     }
   });
