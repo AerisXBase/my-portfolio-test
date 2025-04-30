@@ -6,7 +6,7 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { useGLTF, useAnimations, PerspectiveCamera } from "@react-three/drei";
 import { GLTF } from "three-stdlib";
 import Image from "next/image";
-import { Particles } from "./Particles"; // Import your Particles component
+import { Particles } from "./Particles";
 
 type GLTFWithAnimations = GLTF & {
   animations: THREE.AnimationClip[];
@@ -33,10 +33,10 @@ function ButterflyModel() {
     if (groupRef.current) {
       const time = clock.getElapsedTime();
       const currentX = groupRef.current.position.x;
-      const newX = Math.min(currentX + delta * 0.5, 8);
+      const newX = Math.min(currentX + delta * 2.0, 8); // 16 units in ~8 seconds
       groupRef.current.position.x = newX;
-      groupRef.current.position.y = 0.5 + Math.sin(time * 1) * 0.5;
-      groupRef.current.rotation.z = Math.sin(time * 2) * 0.1;
+      groupRef.current.position.y = 2 + Math.sin(time * 1.5) * 0.5; // Higher, falcon-like motion
+      groupRef.current.rotation.z = Math.sin(time * 2) * 0.1; // Slight tilt
     }
   });
 
@@ -45,7 +45,7 @@ function ButterflyModel() {
       <primitive
         object={gltf.scene}
         scale={1.0}
-        rotation={[0.2, -Math.PI / 2, 0]}
+        rotation={[0.7, -Math.PI / 2, 0]} // Tilt to show back and wings
         castShadow
       />
       <pointLight
@@ -73,7 +73,7 @@ export default function Butterfly() {
 
   if (!webglSupported) {
     return (
-      <div className="fixed inset-0 flex items-center justify-center z-[999]">
+      <div className="fixed inset-0 bg-black flex items-center justify-center z-[999]">
         <Image
           src="/model/butterfly.png"
           alt="Butterfly fallback"
@@ -85,8 +85,17 @@ export default function Butterfly() {
   }
 
   return (
-    <div className="fixed inset-0 z-[999] bg-black pointer-events-none">
-      <Particles /> {/* Particle background */}
+    <div className="fixed inset-0 bg-black z-[999] pointer-events-none">
+      <Particles
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          width: "100%",
+          height: "100%",
+          zIndex: -1,
+        }}
+      />
       <Canvas shadows>
         <PerspectiveCamera makeDefault position={[0, 0, 15]} fov={45} />
         <ambientLight intensity={0.8} />
