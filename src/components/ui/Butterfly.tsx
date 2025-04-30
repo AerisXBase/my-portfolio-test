@@ -6,6 +6,7 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { useGLTF, useAnimations, PerspectiveCamera } from "@react-three/drei";
 import { GLTF } from "three-stdlib";
 import Image from "next/image";
+import { Particles } from "./Particles"; // Import your Particles component
 
 type GLTFWithAnimations = GLTF & {
   animations: THREE.AnimationClip[];
@@ -21,6 +22,7 @@ function ButterflyModel() {
     console.log("Animations:", gltf.animations);
     const [firstAction] = Object.values(actions);
     if (firstAction) {
+      firstAction.setEffectiveTimeScale(1.5); // Faster wing flapping
       firstAction.play();
     } else {
       console.log("No animations found in the model.");
@@ -30,13 +32,10 @@ function ButterflyModel() {
   useFrame(({ clock }, delta) => {
     if (groupRef.current) {
       const time = clock.getElapsedTime();
-      // Fly from x=-8 to x=8 in ~8 seconds (16 units / 2 units per second)
       const currentX = groupRef.current.position.x;
       const newX = Math.min(currentX + delta * 2.0, 8);
       groupRef.current.position.x = newX;
-      // Dynamic up-and-down motion like a falcon
       groupRef.current.position.y = 0.5 + Math.sin(time * 1.5) * 0.5;
-      // Slight tilt for natural flight
       groupRef.current.rotation.z = Math.sin(time * 2) * 0.1;
     }
   });
@@ -46,15 +45,15 @@ function ButterflyModel() {
       <primitive
         object={gltf.scene}
         scale={1.0}
-        rotation={[0.4, -Math.PI / 2, 0]} // Tilt to show body, hide legs
+        rotation={[0.5, -Math.PI / 2, 0]}
+        castShadow
       />
       <pointLight
         position={[0, 0.5, 0]}
         color="#88f"
         intensity={4}
         distance={6}
-      />{" "}
-      {/* Enhanced blue glow */}
+      />
     </group>
   );
 }
@@ -74,7 +73,7 @@ export default function Butterfly() {
 
   if (!webglSupported) {
     return (
-      <div className="fixed inset-0 bg-black flex items-center justify-center z-[999]">
+      <div className="fixed inset-0 flex items-center justify-center z-[999]">
         <Image
           src="/model/butterfly.png"
           alt="Butterfly fallback"
@@ -86,22 +85,28 @@ export default function Butterfly() {
   }
 
   return (
-    <div className="fixed inset-0 bg-black overflow-hidden z-[999] pointer-events-none">
-      <Canvas>
+    <div className="fixed inset-0 z-[999] pointer-events-none">
+      <Particles /> {/* Particle background */}
+      <Canvas shadows>
         <PerspectiveCamera makeDefault position={[0, 0, 15]} fov={45} />
-        <ambientLight intensity={0.8} /> {/* Increased for brighter scene */}
+        <ambientLight intensity={0.8} />
         <directionalLight
           position={[5, 5, 5]}
           intensity={1.2}
           color="#ffffff"
-        />{" "}
-        {/* Brighter main light */}
-        <directionalLight
-          position={[-5, 5, -5]}
-          intensity={0.9}
-          color="#88f"
-        />{" "}
-        {/* Enhanced blue for magic */}
+          castShadow
+          shadow-mapSize-width={1024}
+          shadow-mapSize-height={1024}
+        />
+        <directionalLight position={[-5, 5, -5]} intensity={0.9} color="#88f" />
+        <mesh
+          rotation={[-Math.PI / 2, 0, 0]}
+          position={[0, -1, 0]}
+          receiveShadow
+        >
+          <planeGeometry args={[20, 20]} />
+          <shadowMaterial opacity={0.3} />
+        </mesh>
         <Suspense fallback={null}>
           <ButterflyModel />
         </Suspense>
