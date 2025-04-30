@@ -33,9 +33,9 @@ function ButterflyModel() {
     if (groupRef.current) {
       const time = clock.getElapsedTime();
       const currentX = groupRef.current.position.x;
-      const newX = Math.min(currentX + delta * 2.0, 8);
+      const newX = Math.min(currentX + delta * 0.5, 8);
       groupRef.current.position.x = newX;
-      groupRef.current.position.y = 0.5 + Math.sin(time * 1.5) * 0.5;
+      groupRef.current.position.y = 0.5 + Math.sin(time * 1) * 0.5;
       groupRef.current.rotation.z = Math.sin(time * 2) * 0.1;
     }
   });
@@ -45,7 +45,7 @@ function ButterflyModel() {
       <primitive
         object={gltf.scene}
         scale={1.0}
-        rotation={[0.5, -Math.PI / 2, 0]}
+        rotation={[0.2, -Math.PI / 2, 0]}
         castShadow
       />
       <pointLight
@@ -85,7 +85,7 @@ export default function Butterfly() {
   }
 
   return (
-    <div className="fixed inset-0 z-[999] pointer-events-none">
+    <div className="fixed inset-0 z-[999] bg-black pointer-events-none">
       <Particles /> {/* Particle background */}
       <Canvas shadows>
         <PerspectiveCamera makeDefault position={[0, 0, 15]} fov={45} />
