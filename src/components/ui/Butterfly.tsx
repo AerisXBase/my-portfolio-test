@@ -7,6 +7,7 @@ import { useGLTF, useAnimations, PerspectiveCamera } from "@react-three/drei";
 import { GLTF } from "three-stdlib";
 import Image from "next/image";
 import { Particles } from "./Particles";
+import { useControls } from "leva";
 
 type GLTFWithAnimations = GLTF & {
   animations: THREE.AnimationClip[];
@@ -18,17 +19,19 @@ function ButterflyModel() {
   const { actions } = useAnimations(gltf.animations, groupRef);
   const firstActionRef = useRef<THREE.AnimationAction | null>(null);
 
+  // 🎛️ Add Leva controls
+  const { tiltSpeed, tiltAmount } = useControls("Butterfly Tilt", {
+    tiltSpeed: { value: 2, min: 0, max: 10, step: 0.1 },
+    tiltAmount: { value: 0.1, min: 0, max: 1, step: 0.01 },
+  });
+
   useEffect(() => {
-    console.log("GLTF Model:", gltf);
-    console.log("Animations:", gltf.animations);
     const [firstAction] = Object.values(actions);
     if (firstAction) {
       firstActionRef.current = firstAction;
-      firstAction.setEffectiveTimeScale(1.5); // Faster wing flapping
-      firstAction.paused = true; // Start paused
+      firstAction.setEffectiveTimeScale(1.2);
+      firstAction.paused = false;
       firstAction.play();
-    } else {
-      console.log("No animations found in the model.");
     }
   }, [actions, gltf.animations, gltf]);
 
@@ -36,28 +39,24 @@ function ButterflyModel() {
     if (groupRef.current) {
       const time = clock.getElapsedTime();
       const currentX = groupRef.current.position.x;
-      const newX = Math.min(currentX + delta * 3.2, 8); // 16 units in ~5 seconds
+      const newX = Math.min(currentX + delta * 3.2, 8);
       groupRef.current.position.x = newX;
 
-      // Animation phases
+      // Altitude Phases
       if (time < 1) {
-        // Phase 1: Low flight, no flapping
-        groupRef.current.position.y = 0.5;
+        groupRef.current.position.y = -2;
       } else if (time < 2) {
-        // Phase 2: Takeoff with flapping
-        if (firstActionRef.current && firstActionRef.current.paused) {
-          firstActionRef.current.paused = false; // Start flapping
+        if (firstActionRef.current?.paused) {
+          firstActionRef.current.paused = false;
         }
-        groupRef.current.position.y = 0.5 + (time - 1) * 2; // Rise to y=2.5
+        groupRef.current.position.y = 0.5 + (time - 1) * 2;
       } else {
-        // Phase 3: Natural glide with gentle flapping
         groupRef.current.position.y = 2.5 + Math.sin(time * 1.5) * 0.3;
-        if (firstActionRef.current) {
-          firstActionRef.current.setEffectiveTimeScale(1.0); // Normal flapping
-        }
+        firstActionRef.current?.setEffectiveTimeScale(1.0);
       }
 
-      groupRef.current.rotation.z = Math.sin(time * 2) * 0.1; // Slight tilt
+      // 🎯 Apply tilt based on Leva controls
+      groupRef.current.rotation.z = Math.sin(time * tiltSpeed) * tiltAmount;
     }
   });
 
@@ -66,7 +65,7 @@ function ButterflyModel() {
       <primitive
         object={gltf.scene}
         scale={1.0}
-        rotation={[0.7, -Math.PI / 2, 0]} // Tilt to show back and wings
+        rotation={[0.7, -Math.PI / 2, 0]}
         castShadow
       />
       <pointLight
