@@ -25,37 +25,36 @@ function ButterflyModel() {
     } else {
       console.log("No animations found in the model.");
     }
-  }, [actions, gltf.animations, gltf]); // Added gltf to fix ESLint warning
+  }, [actions, gltf.animations, gltf]);
 
   useFrame(({ clock }, delta) => {
     if (groupRef.current) {
       const time = clock.getElapsedTime();
+      // Fly from x=-8 to x=8 in ~8 seconds (16 units / 2 units per second)
       const currentX = groupRef.current.position.x;
-      const newX = Math.min(currentX + delta * 1.8, 6);
+      const newX = Math.min(currentX + delta * 2.0, 8);
       groupRef.current.position.x = newX;
-      groupRef.current.position.y = Math.sin(time * 2) * 0.3;
+      // Dynamic up-and-down motion like a falcon
+      groupRef.current.position.y = 0.5 + Math.sin(time * 1.5) * 0.5;
+      // Slight tilt for natural flight
+      groupRef.current.rotation.z = Math.sin(time * 2) * 0.1;
     }
   });
 
   return (
-    <group ref={groupRef} position={[-6, 0, 0]}>
+    <group ref={groupRef} position={[-8, 0, 0]}>
       <primitive
         object={gltf.scene}
         scale={1.0}
-        rotation={[0.2, -Math.PI / 2, 0]}
+        rotation={[0.4, -Math.PI / 2, 0]} // Tilt to show body, hide legs
       />
       <pointLight
         position={[0, 0.5, 0]}
         color="#88f"
-        intensity={3}
-        distance={5}
-      />
-      <pointLight
-        position={[0, -0.5, 0]}
-        color="#ff0"
-        intensity={2}
-        distance={5}
-      />
+        intensity={4}
+        distance={6}
+      />{" "}
+      {/* Enhanced blue glow */}
     </group>
   );
 }
@@ -90,13 +89,19 @@ export default function Butterfly() {
     <div className="fixed inset-0 bg-black overflow-hidden z-[999] pointer-events-none">
       <Canvas>
         <PerspectiveCamera makeDefault position={[0, 0, 15]} fov={45} />
-        <ambientLight intensity={0.5} />
+        <ambientLight intensity={0.8} /> {/* Increased for brighter scene */}
         <directionalLight
           position={[5, 5, 5]}
-          intensity={1.0}
+          intensity={1.2}
           color="#ffffff"
-        />
-        <directionalLight position={[-5, 5, -5]} intensity={0.7} color="#88f" />
+        />{" "}
+        {/* Brighter main light */}
+        <directionalLight
+          position={[-5, 5, -5]}
+          intensity={0.9}
+          color="#88f"
+        />{" "}
+        {/* Enhanced blue for magic */}
         <Suspense fallback={null}>
           <ButterflyModel />
         </Suspense>
