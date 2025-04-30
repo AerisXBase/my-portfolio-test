@@ -21,7 +21,7 @@ function ButterflyModel() {
 
   // 🎛️ Add Leva controls
   const { tiltSpeed, tiltAmount } = useControls("Butterfly Tilt", {
-    tiltSpeed: { value: 2, min: 0, max: 10, step: 0.1 },
+    tiltSpeed: { value: 2, min: 0, max: 10, step: 0.5 },
     tiltAmount: { value: 0.1, min: 0, max: 1, step: 0.01 },
   });
 
@@ -44,7 +44,7 @@ function ButterflyModel() {
 
       // Altitude Phases
       if (time < 1) {
-        groupRef.current.position.y = -2;
+        groupRef.current.position.y = 0;
       } else if (time < 2) {
         if (firstActionRef.current?.paused) {
           firstActionRef.current.paused = false;
