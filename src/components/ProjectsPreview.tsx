@@ -1,8 +1,17 @@
-export default function ProjectsPreview() {
+"use client";
+
+// import { motion } from "framer-motion";
+// import { useInView } from "framer-motion";
+// import { useRef } from "react";
+// import { useTheme } from "next-themes";
+// import { cn } from "@/lib/utils";
+
+export default function Projects() {
+  // const ref = useRef(null);
+  // const isInView = useInView(ref, { once: true, amount: 0.3 });
+  // const { resolvedTheme } = useTheme();
+
   return (
-    <section className="p-10">
-      <h2 className="text-3xl font-bold">Featured Projects</h2>
-      <div className="mt-4">Preview of 2-3 top projects here.</div>
-    </section>
+    <section className="min-h-screen flex items-center justify-center py-12"></section>
   );
 }

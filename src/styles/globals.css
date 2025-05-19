@@ -1,8 +1,43 @@
 @import "tailwindcss";
+@import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@400;600&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&display=swap");
 
 body,
 html {
   margin: 0;
   padding: 0;
   overflow-x: hidden;
+  scroll-behavior: smooth;
+}
+
+:root {
+  --cyan-700: #0891b2;
+  --purple-800: #cdaeff;
+  --indigo-900: #312e81;
+  --pastel-purple: #e3d7f9;
+}
+
+:root {
+  --hover-left: 0px;
+  --hover-width: 0px;
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+
+.hero-section {
+  min-height: 100vh;
 }
