@@ -6,6 +6,7 @@ import { WavyBackground } from "./ui/wavy-background";
 import dynamic from "next/dynamic";
 import { useTheme } from "next-themes";
 import { GlobeMethods } from "react-globe.gl";
+import * as d3 from "d3-geo";
 
 // Dynamic import for react-globe.gl to disable SSR
 const Globe = dynamic(() => import("react-globe.gl"), { ssr: false });
@@ -16,48 +17,33 @@ export default function Hero() {
   const [isVisible, setIsVisible] = useState(false);
   const globeRef = useRef<GlobeMethods | undefined>(undefined);
 
-  // Memoized hex polygons data for pastel effect
-  const hexPolygonsData = useMemo(
-    () => [
-      {
-        points: [
-          [0, 0],
-          [10, 0],
-          [10, 10],
-          [0, 10],
-        ],
-        color: theme === "dark" ? "#6b21a8" : "#f9a8d4",
-      }, // Pink water-like
-      {
-        points: [
-          [20, 20],
-          [30, 20],
-          [30, 30],
-          [20, 30],
-        ],
-        color: theme === "dark" ? "#6b21a8" : "#a5f3fc",
-      }, // Blue
-      {
-        points: [
-          [-10, -10],
-          [0, -10],
-          [0, 0],
-          [-10, 0],
-        ],
-        color: theme === "dark" ? "#6b21a8" : "#c4b5fd",
-      }, // Purple land-like
-      {
-        points: [
-          [-20, -20],
-          [-10, -20],
-          [-10, -10],
-          [-20, -10],
-        ],
-        color: theme === "dark" ? "#6b21a8" : "#99f6e4",
-      }, // Green land-like
-    ],
-    [theme]
-  );
+  // Generate hexagonal grid using d3-geo
+  const hexPolygonsData = useMemo(() => {
+    const numCells = 100; // Number of hexagons
+    const points = Array.from({ length: numCells }, () => [
+      Math.random() * 360 - 180, // lng
+      Math.random() * 180 - 90, // lat
+    ]);
+
+    const voronoi = d3.geoVoronoi().polygons(points);
+    const polygons = voronoi.polygons.features.map((feature, i) => ({
+      points: feature.geometry.coordinates[0].map(([lng, lat]) => [lat, lng]),
+      color:
+        theme === "dark"
+          ? i % 2 === 0
+            ? "#6b21a8"
+            : "#1e3a8a" // Galaxy purple/blue
+          : i % 4 === 0
+          ? "#f9a8d4"
+          : i % 4 === 1
+          ? "#c4b5fd"
+          : i % 4 === 2
+          ? "#a5f3fc"
+          : "#99f6e4", // Pastel pink, purple, blue, green
+    }));
+
+    return polygons;
+  }, [theme]);
 
   useEffect(() => {
     setMounted(true);
@@ -113,7 +99,7 @@ export default function Hero() {
           gap-6 
           py-4
         "
-        speed="fast" // Ensure lively animation
+        speed="fast" // Lively animation
       >
         {/* Text Section */}
         <div className="w-full max-w-[600px] flex flex-col items-center text-center space-y-4 lg:items-start lg:text-left">
@@ -145,7 +131,7 @@ export default function Hero() {
         </div>
 
         {/* Globe Section */}
-        <div className="w-full max-w-[400px] lg:max-w-[700px] aspect-square mx-auto lg:mx-0 lg:mt-8">
+        <div className="w-full max-w-[500px] lg:max-w-[800px] aspect-square mx-auto lg:mx-0 lg:mt-8">
           <div
             className={`animate-float ${
               isVisible ? "scale-110" : "scale-100"
@@ -153,7 +139,7 @@ export default function Hero() {
           >
             <Globe
               ref={globeRef}
-              pointsData={[]} // Remove points (sticks)
+              pointsData={[]} // Remove points
               hexPolygonsData={hexPolygonsData}
               hexPolygonColor="color"
               hexPolygonResolution={3}
@@ -165,10 +151,10 @@ export default function Hero() {
               }
               backgroundColor="rgba(0,0,0,0)"
               showAtmosphere={true}
-              atmosphereColor={theme === "dark" ? "#6b21a8" : "#f9a8d4"} // Deep purple for dark, pastel pink for light
+              atmosphereColor={theme === "dark" ? "#6b21a8" : "#f9a8d4"} // Galaxy purple for dark, pastel pink for light
               atmosphereAltitude={0.15}
-              width={theme === "lg" ? 700 : 400} // Larger on large screens
-              height={theme === "lg" ? 700 : 400}
+              width={theme === "lg" ? 800 : 500} // Larger on large screens
+              height={theme === "lg" ? 800 : 500}
             />
           </div>
         </div>
