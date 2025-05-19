@@ -28,6 +28,23 @@ export default function Hero() {
     []
   );
 
+  // Theme-based colors from WavyBackground
+  const lightModeColors = [
+    "#c4b5fd",
+    "#a5b4fc",
+    "#bae6fd",
+    "#a5f3fc",
+    "#93c5fd",
+  ];
+  const darkModeColors = [
+    "#c084fc",
+    "#a78bfa",
+    "#818cf8",
+    "#60a5fa",
+    "#22d3ee",
+  ];
+  const waveColors = theme === "dark" ? darkModeColors : lightModeColors;
+
   const [pointsData, setPointsData] = useState(initialPointsData);
 
   useEffect(() => {
@@ -52,7 +69,7 @@ export default function Hero() {
       // Auto-rotate
       globeRef.current.controls().autoRotate = true;
       globeRef.current.controls().autoRotateSpeed = 0.5;
-      globeRef.current.controls().enableZoom = true;
+      globeRef.current.controls().enableZoom = false; // Disable zoom
       // Initial point of view
       globeRef.current.pointOfView(
         {
@@ -68,12 +85,12 @@ export default function Hero() {
   // Update points color when theme changes
   useEffect(() => {
     setPointsData(
-      initialPointsData.map((point) => ({
+      initialPointsData.map((point, index) => ({
         ...point,
-        color: theme === "dark" ? "#e3d7f9" : "#0891b2",
+        color: waveColors[index % waveColors.length], // Cycle through theme colors
       }))
     );
-  }, [theme, initialPointsData]);
+  }, [theme, initialPointsData, waveColors]);
 
   if (!mounted) return null;
 
@@ -83,7 +100,7 @@ export default function Hero() {
         className="
           flex 
           flex-col 
-          lg:flex-row 
+          md:flex-row 
           items-center 
           justify-between 
           w-full 
@@ -91,10 +108,11 @@ export default function Hero() {
           md:px-12 
           gap-6 
           py-4
+          min-h-screen
         "
       >
         {/* Text Section */}
-        <div className="w-full max-w-[600px] flex flex-col items-center text-center space-y-4 lg:items-start lg:text-left">
+        <div className="w-full md:w-1/2 flex flex-col items-center text-center space-y-4 md:items-start md:text-left">
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-light text-white w-full">
             <Typewriter
               words={["Hey, I’m Isra.", "I build smooth UIs."]}
@@ -123,10 +141,10 @@ export default function Hero() {
         </div>
 
         {/* Globe Section */}
-        <div className="relative w-full max-w-[600px] aspect-square">
+        <div className="w-full md:w-1/2 max-w-[600px] aspect-square">
           <div
             className={`animate-float ${
-              isVisible ? "scale-110" : "scale-100"
+              isVisible ? "scale-105" : "scale-100"
             } transition-transform duration-500 w-full h-full`}
           >
             <Globe
@@ -144,7 +162,7 @@ export default function Hero() {
               }
               backgroundColor="rgba(0,0,0,0)"
               showAtmosphere={true}
-              atmosphereColor={theme === "dark" ? "#e3d7f9" : "#0891b2"}
+              atmosphereColor={theme === "dark" ? "#c084fc" : "#c4b5fd"} // Primary theme color
               atmosphereAltitude={0.15}
               width={600}
               height={600}
