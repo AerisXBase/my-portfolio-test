@@ -52,7 +52,9 @@ export default function Hero() {
       // Auto-rotate
       globeRef.current.controls().autoRotate = true;
       globeRef.current.controls().autoRotateSpeed = 0.5;
-      globeRef.current.controls().enableZoom = false; // Disable pinch-to-zoom
+      globeRef.current.controls().enableZoom = false; // Disable zoom
+      globeRef.current.controls().minDistance = 250; // Lock zoom distance
+      globeRef.current.controls().maxDistance = 250; // Lock zoom distance
       // Initial point of view
       globeRef.current.pointOfView(
         {
@@ -70,7 +72,7 @@ export default function Hero() {
     setPointsData(
       initialPointsData.map((point) => ({
         ...point,
-        color: theme === "dark" ? "#6b21a8" : "#a5f3fc", // Deep purple for dark, pastel cyan for light
+        color: theme === "dark" ? "#6b21a8" : "#c4b5fd", // Deep purple for dark, pastel violet for light
       }))
     );
   }, [theme, initialPointsData]);
@@ -92,6 +94,7 @@ export default function Hero() {
           gap-6 
           py-4
         "
+        speed="fast" // Restore lively animation
       >
         {/* Text Section */}
         <div className="w-full max-w-[600px] flex flex-col items-center text-center space-y-4 lg:items-start lg:text-left">
@@ -123,7 +126,7 @@ export default function Hero() {
         </div>
 
         {/* Globe Section */}
-        <div className="relative w-full max-w-[600px] aspect-square">
+        <div className="w-full max-w-[400px] lg:max-w-[700px] aspect-square mx-auto lg:mx-0">
           <div
             className={`animate-float ${
               isVisible ? "scale-110" : "scale-100"
@@ -144,10 +147,10 @@ export default function Hero() {
               }
               backgroundColor="rgba(0,0,0,0)"
               showAtmosphere={true}
-              atmosphereColor={theme === "dark" ? "#6b21a8" : "#a5f3fc"} // Deep purple for dark, pastel cyan for light
+              atmosphereColor={theme === "dark" ? "#6b21a8" : "#c4b5fd"} // Deep purple for dark, pastel violet for light
               atmosphereAltitude={0.15}
-              width={600}
-              height={600}
+              width={theme === "lg" ? 700 : 400} // Larger on large screens, smaller on medium/small
+              height={theme === "lg" ? 700 : 400}
             />
           </div>
         </div>
