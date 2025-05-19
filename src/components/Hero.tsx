@@ -16,19 +16,48 @@ export default function Hero() {
   const [isVisible, setIsVisible] = useState(false);
   const globeRef = useRef<GlobeMethods | undefined>(undefined);
 
-  // Memoized sample points data
-  const initialPointsData = useMemo(
+  // Memoized hex polygons data for pastel effect
+  const hexPolygonsData = useMemo(
     () => [
-      { lat: 40.7128, lng: -74.006, size: 0.1 }, // New York
-      { lat: 51.5074, lng: -0.1278, size: 0.08 }, // London
-      { lat: 35.6762, lng: 139.6503, size: 0.12 }, // Tokyo
-      { lat: -23.5505, lng: -46.6333, size: 0.07 }, // São Paulo
-      { lat: 28.7041, lng: 77.1025, size: 0.09 }, // Delhi
+      {
+        points: [
+          [0, 0],
+          [10, 0],
+          [10, 10],
+          [0, 10],
+        ],
+        color: theme === "dark" ? "#6b21a8" : "#f9a8d4",
+      }, // Pink water-like
+      {
+        points: [
+          [20, 20],
+          [30, 20],
+          [30, 30],
+          [20, 30],
+        ],
+        color: theme === "dark" ? "#6b21a8" : "#a5f3fc",
+      }, // Blue
+      {
+        points: [
+          [-10, -10],
+          [0, -10],
+          [0, 0],
+          [-10, 0],
+        ],
+        color: theme === "dark" ? "#6b21a8" : "#c4b5fd",
+      }, // Purple land-like
+      {
+        points: [
+          [-20, -20],
+          [-10, -20],
+          [-10, -10],
+          [-20, -10],
+        ],
+        color: theme === "dark" ? "#6b21a8" : "#99f6e4",
+      }, // Green land-like
     ],
-    []
+    [theme]
   );
-
-  const [pointsData, setPointsData] = useState(initialPointsData);
 
   useEffect(() => {
     setMounted(true);
@@ -67,16 +96,6 @@ export default function Hero() {
     }
   }, [mounted]);
 
-  // Update points color when theme changes
-  useEffect(() => {
-    setPointsData(
-      initialPointsData.map((point) => ({
-        ...point,
-        color: theme === "dark" ? "#6b21a8" : "#c4b5fd", // Deep purple for dark, pastel violet for light
-      }))
-    );
-  }, [theme, initialPointsData]);
-
   if (!mounted) return null;
 
   return (
@@ -94,7 +113,7 @@ export default function Hero() {
           gap-6 
           py-4
         "
-        speed="fast" // Restore lively animation
+        speed="fast" // Ensure lively animation
       >
         {/* Text Section */}
         <div className="w-full max-w-[600px] flex flex-col items-center text-center space-y-4 lg:items-start lg:text-left">
@@ -126,7 +145,7 @@ export default function Hero() {
         </div>
 
         {/* Globe Section */}
-        <div className="w-full max-w-[400px] lg:max-w-[700px] aspect-square mx-auto lg:mx-0">
+        <div className="w-full max-w-[400px] lg:max-w-[700px] aspect-square mx-auto lg:mx-0 lg:mt-8">
           <div
             className={`animate-float ${
               isVisible ? "scale-110" : "scale-100"
@@ -134,12 +153,11 @@ export default function Hero() {
           >
             <Globe
               ref={globeRef}
-              pointsData={pointsData}
-              pointAltitude="size"
-              pointRadius={0.5}
-              pointColor="color"
-              pointsMerge={true}
-              pointResolution={8}
+              pointsData={[]} // Remove points (sticks)
+              hexPolygonsData={hexPolygonsData}
+              hexPolygonColor="color"
+              hexPolygonResolution={3}
+              hexPolygonMargin={0.5}
               globeImageUrl={
                 theme === "dark"
                   ? "//unpkg.com/three-globe/example/img/earth-night.jpg"
@@ -147,9 +165,9 @@ export default function Hero() {
               }
               backgroundColor="rgba(0,0,0,0)"
               showAtmosphere={true}
-              atmosphereColor={theme === "dark" ? "#6b21a8" : "#c4b5fd"} // Deep purple for dark, pastel violet for light
+              atmosphereColor={theme === "dark" ? "#6b21a8" : "#f9a8d4"} // Deep purple for dark, pastel pink for light
               atmosphereAltitude={0.15}
-              width={theme === "lg" ? 700 : 400} // Larger on large screens, smaller on medium/small
+              width={theme === "lg" ? 700 : 400} // Larger on large screens
               height={theme === "lg" ? 700 : 400}
             />
           </div>
