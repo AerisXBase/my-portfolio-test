@@ -6,10 +6,59 @@ import { WavyBackground } from "./ui/wavy-background";
 import dynamic from "next/dynamic";
 import { useTheme } from "next-themes";
 import { GlobeMethods } from "react-globe.gl";
-import * as d3 from "d3-geo";
+
+// Type for polygon data (simplified)
+type PolygonData = {
+  type: string;
+  properties: { color: string };
+  geometry: GeoJSON.Polygon;
+};
 
 // Dynamic import for react-globe.gl to disable SSR
 const Globe = dynamic(() => import("react-globe.gl"), { ssr: false });
+
+// Simplified GeoJSON for countries (subset for demo, no country names)
+const countriesGeoJSON: GeoJSON.FeatureCollection<GeoJSON.Polygon> = {
+  type: "FeatureCollection",
+  features: [
+    // Brazil
+    {
+      type: "Feature",
+      properties: { color: "#f9a8d4" }, // Default color, will be overridden
+      geometry: {
+        type: "Polygon",
+        coordinates: [
+          [
+            [-73.99, -33.75],
+            [-53.37, -33.75],
+            [-32.39, -3.71],
+            [-36.19, 5.27],
+            [-51.22, 5.27],
+            [-73.99, -33.75],
+          ],
+        ],
+      },
+    },
+    // Australia
+    {
+      type: "Feature",
+      properties: { color: "#c4b5fd" }, // Default color, will be overridden
+      geometry: {
+        type: "Polygon",
+        coordinates: [
+          [
+            [113.34, -43.63],
+            [153.64, -43.63],
+            [153.64, -10.41],
+            [113.34, -10.41],
+            [113.34, -43.63],
+          ],
+        ],
+      },
+    },
+    // Add more countries from ne_110m_admin_0_countries.geojson
+  ],
+};
 
 export default function Hero() {
   const { theme } = useTheme();
@@ -17,32 +66,25 @@ export default function Hero() {
   const [isVisible, setIsVisible] = useState(false);
   const globeRef = useRef<GlobeMethods | undefined>(undefined);
 
-  // Generate hexagonal grid using d3-geo
-  const hexPolygonsData = useMemo(() => {
-    const numCells = 100; // Number of hexagons
-    const points = Array.from({ length: numCells }, () => [
-      Math.random() * 360 - 180, // lng
-      Math.random() * 180 - 90, // lat
-    ]);
-
-    const voronoi = d3.geoVoronoi().polygons(points);
-    const polygons = voronoi.polygons.features.map((feature, i) => ({
-      points: feature.geometry.coordinates[0].map(([lng, lat]) => [lat, lng]),
-      color:
-        theme === "dark"
-          ? i % 2 === 0
-            ? "#6b21a8"
-            : "#1e3a8a" // Galaxy purple/blue
-          : i % 4 === 0
-          ? "#f9a8d4"
-          : i % 4 === 1
-          ? "#c4b5fd"
-          : i % 4 === 2
-          ? "#a5f3fc"
-          : "#99f6e4", // Pastel pink, purple, blue, green
+  // Memoized polygons data
+  const polygonsData = useMemo<PolygonData[]>(() => {
+    return countriesGeoJSON.features.map((feature, i) => ({
+      ...feature,
+      properties: {
+        color:
+          theme === "dark"
+            ? i % 2 === 0
+              ? "#6b21a8"
+              : "#1e3a8a" // Galaxy purple/blue
+            : i % 4 === 0
+            ? "#f9a8d4"
+            : i % 4 === 1
+            ? "#c4b5fd"
+            : i % 4 === 2
+            ? "#a5f3fc"
+            : "#99f6e4", // Pastel pink, purple, blue, green
+      },
     }));
-
-    return polygons;
   }, [theme]);
 
   useEffect(() => {
@@ -140,10 +182,18 @@ export default function Hero() {
             <Globe
               ref={globeRef}
               pointsData={[]} // Remove points
-              hexPolygonsData={hexPolygonsData}
-              hexPolygonColor="color"
-              hexPolygonResolution={3}
-              hexPolygonMargin={0.5}
+              polygonsData={polygonsData}
+              polygonGeoJsonGeometry="geometry"
+              polygonCapColor={(d: unknown) =>
+                (d as { properties: { color: string } }).properties.color
+              }
+              polygonSideColor={(d: unknown) =>
+                (d as { properties: { color: string } }).properties.color
+              }
+              polygonStrokeColor={() => "#ffffff"}
+              polygonAltitude={0.05}
+              polygonCapCurvatureResolution={5}
+              polygonsTransitionDuration={1000}
               globeImageUrl={
                 theme === "dark"
                   ? "//unpkg.com/three-globe/example/img/earth-night.jpg"
