@@ -1,5 +1,5 @@
 @import "tailwindcss";
-@import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@400;600&display=swap");
+/* @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Space+Grotesk:wght@300;400;500;700&family=Press+Start+2P&display=swap"); */
 @import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&display=swap");
 
 body,
@@ -17,27 +17,81 @@ html {
   --pastel-purple: #e3d7f9;
 }
 
-:root {
-  --hover-left: 0px;
-  --hover-width: 0px;
+.glass-button {
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.1),
+    0 0 20px rgba(255, 255, 255, 0.05), inset 0 0 10px rgba(255, 255, 255, 0.05);
+  transition: all 0.3s ease;
 }
 
-@keyframes float {
+.glass-button:hover {
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.2),
+    0 0 30px rgba(255, 255, 255, 0.1), inset 0 0 15px rgba(255, 255, 255, 0.08);
+}
+
+.bg-light-gradient {
+  background: #f9d6ea;
+}
+.bg-dark-gradient {
+  background: #150c24; /* fallback */
+  background: -webkit-linear-gradient(to right, #0a1a2f, #150c24);
+  background: linear-gradient(to right, #0a1a2f, #150c24);
+}
+
+/* src/app/globals.css */
+.three-body {
+  --uib-size: 35px;
+  --uib-speed: 0.8s;
+  --uib-color: #5e5ef2;
+  position: relative;
+  display: inline-block;
+  height: var(--uib-size);
+  width: var(--uib-size);
+  animation: spin78236 calc(var(--uib-speed) * 2.5) infinite linear;
+}
+
+.three-body__dot {
+  position: absolute;
+  height: 100%;
+  width: 30%;
+  top: 0%;
+  background-color: var(--uib-color);
+  border-radius: 50%;
+}
+
+.three-body__dot:nth-child(1) {
+  left: 0%;
+  animation: grow72328 var(--uib-speed) infinite ease-in-out;
+}
+
+.three-body__dot:nth-child(2) {
+  left: 35%;
+  animation: grow72328 var(--uib-speed) infinite ease-in-out
+    calc(var(--uib-speed) * -0.4);
+}
+
+.three-body__dot:nth-child(3) {
+  left: 70%;
+  animation: grow72328 var(--uib-speed) infinite ease-in-out
+    calc(var(--uib-speed) * -0.8);
+}
+
+@keyframes spin78236 {
   0% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-20px);
+    transform: rotate(0deg);
   }
   100% {
-    transform: translateY(0);
+    transform: rotate(360deg);
   }
 }
 
-.animate-float {
-  animation: float 4s ease-in-out infinite;
-}
-
-.hero-section {
-  min-height: 100vh;
+@keyframes grow72328 {
+  0%,
+  100% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }

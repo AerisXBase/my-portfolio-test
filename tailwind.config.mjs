@@ -1,3 +1,4 @@
+// tailwind.config.js
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   darkMode: "class",
@@ -5,10 +6,10 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        orbitron: ["Orbitron", "sans-serif"],
         inter: ["Inter", "sans-serif"],
-        poppins: ["Poppins", "sans-serif"],
         grotesk: ["Space Grotesk", "sans-serif"],
+        pressstart: ["'Press Start 2P'", "cursive"],
+        exile: ["'Exile Static'", "sans-serif"],
       },
     },
   },
